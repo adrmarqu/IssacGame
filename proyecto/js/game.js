@@ -1,8 +1,7 @@
 export class Game extends Phaser.Scene {
 	
-
 	constructor() {
-		super({key: 'game' });
+		super({ key: 'game' });
 	}
 
 	preload() {
@@ -13,7 +12,7 @@ export class Game extends Phaser.Scene {
 	create() {
 
 		this.add.image(0, 0, 'background');
-
+		
 	}
 
 }
