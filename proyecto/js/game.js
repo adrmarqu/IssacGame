@@ -1,4 +1,4 @@
-import * as player from './player.js';
+import * as isaac from './player.js';
 import * as keys from './keys.js';
 
 export class Game extends Phaser.Scene {
@@ -9,10 +9,10 @@ export class Game extends Phaser.Scene {
 
 	preload() 
 	{
-		this.load.image('tiles', 'assets/tilemap/tiles.png');
+		this.load.image('tiles', 'tileset/tiles.png');
 		this.load.tilemapTiledJSON('map', 'assets/tilemap/map.json');
 
-		player.preload.call(this)
+		isaac.preload.call(this)
 	}
 	
 	create() 
@@ -26,14 +26,16 @@ export class Game extends Phaser.Scene {
 		var decoration = map.createLayer('Decoration', tileset);
 		var wall = map.createLayer('Wall', tileset);
 
-		player.create.call(this);
+		isaac.create.call(this);
 		keys.create.call(this);
+
+		this.physics.add.collider(isaac.player, wall);
 		
 	}
 
 	update() 
 	{
-		player.update.call(this);
+		isaac.update.call(this);
 	}
 
 }
