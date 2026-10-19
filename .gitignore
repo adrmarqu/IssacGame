@@ -16,3 +16,4 @@ ehthumbs.db
 node_modules/
 *.log
 *.tmp
+*.zip
