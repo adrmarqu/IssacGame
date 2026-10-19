@@ -12,12 +12,14 @@ export function preload()
 
 export function create()
 {
-    this.add.sprite(0,0,'tiles');
-
 	map = this.make.tilemap({key: 'map'});
 	tileset = map.addTilesetImage('Basement', 'tiles');
 	
-    ground = map.createLayer('Ground', tileset);
+	ground = map.createLayer('Ground', tileset);
 	decoration = map.createLayer('Decoration', tileset);
 	wall = map.createLayer('Wall', tileset);
+	wall.setCollisionByProperty({ collides: true });
+
+	this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+	this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 }

@@ -1,4 +1,6 @@
 import * as keys from './keys.js';
+import * as fly from './fly.js';
+import * as boss from './boss.js';
 
 export var player;
 export var playerSpeed;
@@ -6,14 +8,17 @@ export var playerSpeed;
 export var healthT;
 export var bombT;
 export var keyT;
+export var tearList;
 
 var shootTime;
 var bombTime;
+var canTakeDamage = true;
 
 export function preload() 
 {
 	this.load.spritesheet('player','assets/animations/player.png', { frameWidth: 94, frameHeight: 64 });
 	this.load.image('bullet', 'assets/sprites/tear.png');
+	this.load.image('bomb', 'assets/sprites/bomb.png');
 } 
  
 export function create() 
@@ -26,54 +31,65 @@ export function create()
 function createPlayer() 
 {
 	player = this.physics.add.sprite(400,300,'player');
-	player.body.setSize(30, 40, true)
+	player.body.setSize(30, 40, true);
+	player.setCollideWorldBounds(true);
 	player.state = 0;
 	playerSpeed = 200;
 	player.health = 5;
 	player.bombs = 3;
 	player.keys = 0;
 
+	canTakeDamage = true;
 	shootTime = 0;
 	bombTime = 0;
 
 	this.cameras.main.startFollow(player);
 
-	this.tearList = this.physics.add.group();
+	tearList = this.physics.add.group();
+	this.tearList = tearList;
 }
 
 function createAnimationPlayer()
 {
+	if (this.anims.exists('UpAnim')) 
+	{
+		return;
+	}
+
 	this.anims.create({
 		key: 'UpAnim',
 		frames: this.anims.generateFrameNumbers('player', { frames: [ 9, 10, 11 ] }),
 		frameRate: 8
-    });
+	});
 
 	this.anims.create({
 		key: 'DownAnim',
 		frames: this.anims.generateFrameNumbers('player', { frames: [ 0, 1, 2 ] }),
 		frameRate: 8,
 		repeat: -1
-    });
+	});
 	
 	this.anims.create({
 		key: 'LeftAnim',
 		frames: this.anims.generateFrameNumbers('player', { frames: [ 3, 4, 5 ] }),
 		frameRate: 8
-    });
+	});
 
 	this.anims.create({
 		key: 'RightAnim',
 		frames: this.anims.generateFrameNumbers('player', { frames: [ 6, 7, 8 ] }),
 		frameRate: 8
-    });
+	});
 }
 
 function cretaeInventory()
 {
-	healthT = this.add.text(210, 160, 'Health: ' + player.health, { fontsize: '32px', fill: '#FFF' });
-	bombT = this.add.text(210, 185, 'Bombs: ' + player.bombs, { fontsize: '32px', fill: '#FFF' });
-	keyT = this.add.text(210, 210, 'Keys: ' + player.keys, { fontsize: '32px', fill: '#FFF' });
+	healthT = this.add.text(10, 10, 'Health: ' + player.health, { fontSize: '14px', fill: '#FFF' });
+	healthT.setScrollFactor(0);
+	bombT = this.add.text(10, 28, 'Bombs: ' + player.bombs, { fontSize: '14px', fill: '#FFF' });
+	bombT.setScrollFactor(0);
+	keyT = this.add.text(10, 46, 'Keys: ' + player.keys, { fontSize: '14px', fill: '#FFF' });
+	keyT.setScrollFactor(0);
 }
 
 export function update() 
@@ -83,7 +99,10 @@ export function update()
 
 function controlsPlayer() 
 {
-	// Player state --> 1- mirando arriba, 2- mirando abajo, 3- mirando izquierda, 4- mirando derecha
+	if (!player || player.health <= 0) 
+	{
+		return;
+	}
 
 	if (keys.Up.isDown) 
 	{
@@ -125,7 +144,7 @@ function controlsPlayer()
 		playerShoot.call(this);
 	}
 
-	if (keys.Bomb.isDown && bombTime > 50 && player.bombs > 0) 
+	if ((keys.Bomb.isDown || keys.BombE.isDown) && bombTime > 50 && player.bombs > 0) 
 	{
 		bombTime = 0;
 		useBomb.call(this);
@@ -157,7 +176,7 @@ function animationPlayer()
 
 function playerShoot() 
 {
-	var tear = this.tearList.create(player.x, player.y, 'bullet');
+	var tear = tearList.create(player.x, player.y, 'bullet');
 
 	if (player.state == 1) 
 	{
@@ -175,15 +194,58 @@ function playerShoot()
 	{
 		tear.setVelocityX(250);
 	}
+	else 
+	{
+		tear.setVelocityY(250);
+	}
 }
 
 export function lostLife()
 {
+	if (!canTakeDamage || player.health <= 0)
+	{
+		return;
+	}
+
+	canTakeDamage = false;
 	player.health--;
+
+	if (healthT)
+	{
+		healthT.setText('Health: ' + player.health);
+	}
+
+	player.setTint(0xff0000);
+
+	setTimeout(() => {
+		if (player && player.clearTint)
+		{
+			player.clearTint();
+		}
+	}, 200);
+
+	setTimeout(() => {
+		if (player && player.health > 0)
+		{
+			canTakeDamage = true;
+		}
+	}, 1000);
 
 	if (player.health <= 0)
 	{
-		console.log("You lost");
+		canTakeDamage = false;
+		player.setVelocity(0, 0);
+		player.setTint(0x555555);
+
+		this.add.text(200, 150, 'GAME OVER', {
+			fontSize: '28px',
+			fill: '#FF0000',
+			fontStyle: 'bold'
+		}).setOrigin(0.5).setScrollFactor(0);
+
+		this.time.delayedCall(1000, () => {
+			this.scene.restart();
+		});
 	}
 }
 
@@ -191,6 +253,62 @@ function useBomb()
 {
 	player.bombs--;
 	bombT.setText('Bombs: ' + player.bombs);
+
+	var bomb = this.physics.add.sprite(player.x, player.y, 'bomb');
+	bomb.setScale(0.35);
+
+	var flashInterval = setInterval(() => {
+		if (bomb && bomb.active) 
+		{
+			bomb.setTint(bomb.isTinted ? 0xffffff : 0xff0000);
+		}
+	}, 250);
+
+	setTimeout(() => {
+		clearInterval(flashInterval);
+		if (bomb && bomb.active) 
+		{
+			this.cameras.main.shake(150, 0.01);
+
+			if (fly && fly.flies) 
+			{
+				fly.flies.getChildren().forEach((enemy) => {
+					if (enemy && enemy.active) 
+					{
+						var dist = Phaser.Math.Distance.Between(bomb.x, bomb.y, enemy.x, enemy.y);
+						if (dist < 90) 
+						{
+							fly.hitEnemy(enemy, this);
+							fly.hitEnemy(enemy, this);
+							fly.hitEnemy(enemy, this);
+						}
+					}
+				});
+			}
+
+			if (boss && boss.bossActive && boss.bossGroup) 
+			{
+				boss.bossGroup.getChildren().forEach((b) => {
+					if (b && b.active) 
+					{
+						var dist = Phaser.Math.Distance.Between(bomb.x, bomb.y, b.x, b.y);
+						if (dist < 100) 
+						{
+							boss.hitBoss(5, this);
+						}
+					}
+				});
+			}
+
+			var distToPlayer = Phaser.Math.Distance.Between(bomb.x, bomb.y, player.x, player.y);
+			if (distToPlayer < 70) 
+			{
+				lostLife.call(this);
+			}
+
+			bomb.destroy();
+		}
+	}, 2000);
 }
 
 export function getBomb()

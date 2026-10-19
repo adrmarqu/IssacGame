@@ -1,18 +1,20 @@
-export var pointer
-export var Up
-export var Down
-export var Left
-export var Right
-export var Shoot
+export var pointer;
+export var Up;
+export var Down;
+export var Left;
+export var Right;
+export var Shoot;
 export var Bomb;
+export var BombE;
 
 export function create()
 {
-	pointer = this.input.activePointer
+	pointer = this.input.activePointer;
 	Up = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 	Down = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
 	Left = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 	Right = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 	Shoot = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 	Bomb = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-} 
+	BombE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+}
