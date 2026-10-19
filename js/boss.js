@@ -52,8 +52,11 @@ export function spawnBoss(scene)
 	bossSprite.setVelocity(60, 40);
 
 	bossText = scene.add.text(200, 260, 'DUKE OF FLIES', { fontSize: '11px', fill: '#FFF', fontStyle: 'bold' }).setOrigin(0.5).setScrollFactor(0);
+	bossText.setDepth(100);
 	bossBarBg = scene.add.rectangle(200, 275, 204, 10, 0x333333).setScrollFactor(0);
+	bossBarBg.setDepth(100);
 	bossBar = scene.add.rectangle(200, 275, 200, 8, 0xCC0000).setScrollFactor(0);
+	bossBar.setDepth(101);
 
 	shootEvent = scene.time.addEvent({
 		delay: 2000,
@@ -161,11 +164,12 @@ export function hitBoss(damage, scene)
 			bossText = null;
 		}
 
-		scene.add.text(200, 140, 'VICTORY!\nBOSS DEFEATED', {
+		var victoryText = scene.add.text(200, 140, 'VICTORY!\nBOSS DEFEATED', {
 			fontSize: '22px',
 			fill: '#FFD700',
 			align: 'center',
 			fontStyle: 'bold'
 		}).setOrigin(0.5).setScrollFactor(0);
+		victoryText.setDepth(200);
 	}
 }

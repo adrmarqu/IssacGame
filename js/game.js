@@ -42,11 +42,14 @@ export class Game extends Phaser.Scene {
 		door.setScale(1.2);
 		door.setImmovable(true);
 		door.body.setSize(44, 40);
+		door.setDepth(1);
 
 		controlsHint = this.add.text(200, 285, 'WASD: Move  |  SPACE: Shoot  |  Q/E: Bomb', {
 			fontSize: '10px',
 			fill: '#BBB'
 		}).setOrigin(0.5).setScrollFactor(0);
+		controlsHint.setDepth(100);
+		controlsHint.setStroke('#000000', 3);
 
 		this.physics.add.collider(isaac.player, issacMap.wall);
 		this.physics.add.collider(fly.flies, issacMap.wall);

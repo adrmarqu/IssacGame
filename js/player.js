@@ -86,10 +86,18 @@ function cretaeInventory()
 {
 	healthT = this.add.text(10, 10, 'Health: ' + player.health, { fontSize: '14px', fill: '#FFF' });
 	healthT.setScrollFactor(0);
+	healthT.setDepth(100);
+	healthT.setStroke('#000000', 3);
+
 	bombT = this.add.text(10, 28, 'Bombs: ' + player.bombs, { fontSize: '14px', fill: '#FFF' });
 	bombT.setScrollFactor(0);
+	bombT.setDepth(100);
+	bombT.setStroke('#000000', 3);
+
 	keyT = this.add.text(10, 46, 'Keys: ' + player.keys, { fontSize: '14px', fill: '#FFF' });
 	keyT.setScrollFactor(0);
+	keyT.setDepth(100);
+	keyT.setStroke('#000000', 3);
 }
 
 export function update() 
@@ -237,11 +245,12 @@ export function lostLife()
 		player.setVelocity(0, 0);
 		player.setTint(0x555555);
 
-		this.add.text(200, 150, 'GAME OVER', {
+		var gameOverText = this.add.text(200, 150, 'GAME OVER', {
 			fontSize: '28px',
 			fill: '#FF0000',
 			fontStyle: 'bold'
 		}).setOrigin(0.5).setScrollFactor(0);
+		gameOverText.setDepth(200);
 
 		this.time.delayedCall(1000, () => {
 			this.scene.restart();
